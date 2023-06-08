@@ -11,6 +11,8 @@ export async function middleware(req: NextRequest) {
   const country = geo.country || 'US'
   const city = geo.city || 'San Francisco'
   const region = geo.region || 'CA'
+  const latitude = geo.latitude
+  const longitude = geo.longitude
 
   const countryInfo = countries.find((x) => x.cca2 === country)
 
@@ -21,6 +23,8 @@ export async function middleware(req: NextRequest) {
   url.searchParams.set('country', country)
   url.searchParams.set('city', city)
   url.searchParams.set('region', region)
+  url.searchParams.set('lat', latitude)
+  url.searchParams.set('lon', longitude)
   url.searchParams.set('currencyCode', currencyCode)
   url.searchParams.set('currencySymbol', currency.symbol)
   url.searchParams.set('name', currency.name)

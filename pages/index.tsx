@@ -12,6 +12,8 @@ export const getServerSideProps = ({ query }) => ({
 export default function Index({
   name,
   languages,
+  latitude,
+  longitude,
   city,
   region,
   country,
@@ -84,6 +86,14 @@ export default function Index({
           <div className="p-4 flexborder-b bg-gray-50 rounded-b-lg">
             <h4 className="font-semibold text-left">Geolocation Headers</h4>
             <pre className="bg-black text-white font-mono text-left py-2 px-4 rounded-lg mt-4 text-sm leading-6">
+            <p>
+                <strong>{'x-vercel-ip-latitude: '}</strong>
+                {latitude}
+              </p>
+              <p>
+                <strong>{'x-vercel-ip-longitude: '}</strong>
+                {longitude}
+              </p>
               <p>
                 <strong>{'x-vercel-ip-city: '}</strong>
                 {city}
