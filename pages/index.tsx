@@ -1,8 +1,10 @@
 import Image from "next/image";
 import map from "../public/map.svg";
+import locationDot from "../public/location-dot.png";
 import { Layout } from "@vercel/examples-ui";
-import { useLoadScript, GoogleMap } from "@react-google-maps/api";
+import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api";
 import { useMemo } from "react";
+import CurrentlocationDot from "../components/CurrentLocationDot";
 
 export const getServerSideProps = ({ query }) => ({
   props: query,
@@ -49,8 +51,14 @@ export default function Index({ latitude, longitude }) {
             width: "100vw",
             height: "100vh",
           }}
-          onLoad={() => console.log(`Map Loaded. Found coordinates - ${latitude}, ${longitude}`)}
-        />
+          onLoad={() =>
+            console.log(
+              `Map Loaded. Found coordinates - ${latitude}, ${longitude}`
+            )
+          }
+        >
+          <CurrentlocationDot position={mapCenter} />
+        </GoogleMap>
       </main>
     </div>
   );
