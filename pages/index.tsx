@@ -1,9 +1,8 @@
 import Image from "next/image";
 import map from "../public/map.svg";
-import locationDot from "../public/location-dot.png";
 import { Layout } from "@vercel/examples-ui";
-import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api";
-import { useMemo } from "react";
+import { useLoadScript, GoogleMap, Autocomplete } from "@react-google-maps/api";
+import { useMemo, useState } from "react";
 import CurrentlocationDot from "../components/CurrentLocationDot";
 
 export const getServerSideProps = ({ query }) => ({
@@ -12,7 +11,10 @@ export const getServerSideProps = ({ query }) => ({
 
 export default function Index({ latitude, longitude }) {
   const libraries = useMemo(() => ["places"], []);
-  const mapCenter = useMemo(() => ({ lat: +latitude, lng: +longitude }), []);
+  const [mapCenter, setMapCenter] = useState({
+    lat: +latitude,
+    lng: +longitude,
+  });
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -51,13 +53,41 @@ export default function Index({ latitude, longitude }) {
             width: "100vw",
             height: "100vh",
           }}
-          onLoad={() =>
-            console.log(
-              `Map Loaded. Found coordinates - ${latitude}, ${longitude}`
-            )
-          }
+          onLoad={() => {
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition((position) => {
+                const pos = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude,
+                };
+                setMapCenter(pos);
+              });
+            }
+          }}
         >
           <CurrentlocationDot position={mapCenter} />
+          <Autocomplete>
+            <input
+              type="text"
+              placeholder="Search for a place"
+              style={{
+                background: "#fff",
+                boxSizing: `border-box`,
+                border: `1px solid transparent`,
+                width: `240px`,
+                height: `32px`,
+                padding: `0 12px`,
+                borderRadius: `3px`,
+                boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+                fontSize: `14px`,
+                outline: `none`,
+                textOverflow: `ellipses`,
+                position: "absolute",
+                left: "0%",
+                marginLeft: "0px",
+              }}
+            />
+          </Autocomplete>
         </GoogleMap>
       </main>
     </div>
