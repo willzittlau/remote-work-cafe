@@ -1,9 +1,11 @@
 import Image from "next/image";
 import map from "../public/map.svg";
 import { Layout } from "@vercel/examples-ui";
-import { useLoadScript, GoogleMap, Autocomplete } from "@react-google-maps/api";
+import { useLoadScript, GoogleMap } from "@react-google-maps/api";
 import { useMemo, useState } from "react";
 import CurrentlocationDot from "../components/CurrentLocationDot";
+import SearchBar from "../components/SearchBar";
+import LocationButton from "../components/LocationButton";
 
 export const getServerSideProps = ({ query }) => ({
   props: query,
@@ -53,41 +55,10 @@ export default function Index({ latitude, longitude }) {
             width: "100vw",
             height: "100vh",
           }}
-          onLoad={() => {
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition((position) => {
-                const pos = {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                };
-                setMapCenter(pos);
-              });
-            }
-          }}
         >
           <CurrentlocationDot position={mapCenter} />
-          <Autocomplete>
-            <input
-              type="text"
-              placeholder="Search for a place"
-              style={{
-                background: "#fff",
-                boxSizing: `border-box`,
-                border: `1px solid transparent`,
-                width: `240px`,
-                height: `32px`,
-                padding: `0 12px`,
-                borderRadius: `3px`,
-                boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
-                fontSize: `14px`,
-                outline: `none`,
-                textOverflow: `ellipses`,
-                position: "absolute",
-                left: "0%",
-                marginLeft: "0px",
-              }}
-            />
-          </Autocomplete>
+          <SearchBar />
+          <LocationButton setMapCenter={setMapCenter} />
         </GoogleMap>
       </main>
     </div>
