@@ -2,7 +2,7 @@ import Image from "next/image";
 import map from "../public/map.svg";
 import { Layout } from "@vercel/examples-ui";
 import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import CurrentlocationDot from "../components/CurrentLocationDot";
 import SearchBar from "../components/SearchBar";
 import LocationButton from "../components/LocationButton";
@@ -102,7 +102,7 @@ export default function Index({ latitude, longitude }) {
           }}
         >
           <CurrentlocationDot position={userCoordinates} />
-          <SearchBar />
+          <SearchBar setMapCenter={setMapCenter} />
           <LocationButton
             setMapCenter={setMapCenter}
             setUserCoordinates={setUserCoordinates}

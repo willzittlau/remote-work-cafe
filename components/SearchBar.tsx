@@ -1,8 +1,26 @@
 import { Autocomplete } from "@react-google-maps/api";
+import { useState } from "react";
 
-export default function SearchBar() {
+export default function SearchBar({ setMapCenter }) {
+  const [ref, setRef] = useState(null);
+
+  function onLoad(autocomplete) {
+    setRef(autocomplete);
+  }
+
+  function onPlaceChanged() {
+    if (ref) {
+      const place = ref.getPlace();
+      const location = {
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+      };
+      setMapCenter(location);
+    }
+  }
+
   return (
-    <Autocomplete>
+    <Autocomplete onPlaceChanged={onPlaceChanged} onLoad={onLoad}>
       <input
         type="text"
         placeholder="Search for a place"
