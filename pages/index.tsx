@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import CurrentlocationDot from "../components/CurrentLocationDot";
 import SearchBar from "../components/SearchBar";
 import LocationButton from "../components/LocationButton";
+import getPlaces from "../helpers/getPlaces";
 
 export const getServerSideProps = ({ query }) => ({
   props: query,
@@ -13,6 +14,7 @@ export const getServerSideProps = ({ query }) => ({
 
 export default function Index({ latitude, longitude }) {
   const libraries = useMemo(() => ["places"], []);
+  const [mapref, setMapRef] = useState(null);
   const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState({
     lat: +latitude,
@@ -23,27 +25,6 @@ export default function Index({ latitude, longitude }) {
     lng: +longitude,
   });
 
-  useEffect(() => {
-    const location = `${mapCenter.lat},${mapCenter.lng}`;
-    const radius = 1000;
-    const type = "cafe";
-    const API_URL = `/api/location?location=${location}&radius=${radius}&type=${type}`;
-
-    fetch(API_URL, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setPlaces(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [mapCenter]);
-
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
       disableDefaultUI: true,
@@ -52,18 +33,43 @@ export default function Index({ latitude, longitude }) {
     []
   );
 
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
+    libraries: libraries as any,
+  });
+
+  const handleCenterChanged = () => {
+    if (mapref) {
+      const newCenter = mapref.getCenter();
+      const location = `${newCenter.lat()},${newCenter.lng()}`;
+      getPlaces(location)
+        .then((data) => {
+          setPlaces(data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  };
+
+  const handleOnLoad = (map) => {
+    setMapRef(map);
+    const location = `${mapCenter.lat},${mapCenter.lng}`;
+    getPlaces(location)
+      .then((data) => {
+        setPlaces(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const markers = places.map((place) => {
     const position = {
       lat: +place.location.latitude,
       lng: +place.location.longitude,
     };
-    console.log(position);
-    return <Marker position={position} key={place.id} label={place.name}/>;
-  });
-
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
-    libraries: libraries as any,
+    return <Marker position={position} key={place.id} label={place.name} />;
   });
 
   if (!isLoaded) {
@@ -90,7 +96,10 @@ export default function Index({ latitude, longitude }) {
             width: "100vw",
             height: "100vh",
           }}
-          onCenterChanged={() => {}}
+          onLoad={handleOnLoad}
+          onCenterChanged={() => {
+            handleCenterChanged();
+          }}
         >
           <CurrentlocationDot position={userCoordinates} />
           <SearchBar />
