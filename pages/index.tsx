@@ -1,8 +1,8 @@
 import Image from "next/image";
 import map from "../public/map.svg";
 import { Layout } from "@vercel/examples-ui";
-import { useLoadScript, GoogleMap } from "@react-google-maps/api";
-import { useMemo, useState } from "react";
+import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api";
+import { useEffect, useMemo, useState } from "react";
 import CurrentlocationDot from "../components/CurrentLocationDot";
 import SearchBar from "../components/SearchBar";
 import LocationButton from "../components/LocationButton";
@@ -13,10 +13,36 @@ export const getServerSideProps = ({ query }) => ({
 
 export default function Index({ latitude, longitude }) {
   const libraries = useMemo(() => ["places"], []);
+  const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState({
     lat: +latitude,
     lng: +longitude,
   });
+  const [userCoordinates, setUserCoordinates] = useState({
+    lat: +latitude,
+    lng: +longitude,
+  });
+
+  useEffect(() => {
+    const location = `${mapCenter.lat},${mapCenter.lng}`;
+    const radius = 1000;
+    const type = "cafe";
+    const API_URL = `/api/location?location=${location}&radius=${radius}&type=${type}`;
+
+    fetch(API_URL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setPlaces(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [mapCenter]);
 
   const mapOptions = useMemo<google.maps.MapOptions>(
     () => ({
@@ -25,6 +51,15 @@ export default function Index({ latitude, longitude }) {
     }),
     []
   );
+
+  const markers = places.map((place) => {
+    const position = {
+      lat: +place.location.latitude,
+      lng: +place.location.longitude,
+    };
+    console.log(position);
+    return <Marker position={position} key={place.id} label={place.name}/>;
+  });
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY as string,
@@ -55,10 +90,15 @@ export default function Index({ latitude, longitude }) {
             width: "100vw",
             height: "100vh",
           }}
+          onCenterChanged={() => {}}
         >
-          <CurrentlocationDot position={mapCenter} />
+          <CurrentlocationDot position={userCoordinates} />
           <SearchBar />
-          <LocationButton setMapCenter={setMapCenter} />
+          <LocationButton
+            setMapCenter={setMapCenter}
+            setUserCoordinates={setUserCoordinates}
+          />
+          {markers}
         </GoogleMap>
       </main>
     </div>

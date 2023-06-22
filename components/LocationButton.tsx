@@ -1,4 +1,4 @@
-export default function LocationButton({ setMapCenter }) {
+export default function LocationButton({ setMapCenter, setUserCoordinates }) {
   return (
     <button
       onClick={() => {
@@ -9,6 +9,7 @@ export default function LocationButton({ setMapCenter }) {
               lng: position.coords.longitude,
             };
             setMapCenter(pos);
+            setUserCoordinates(pos);
           });
         }
       }}
@@ -28,12 +29,11 @@ export default function LocationButton({ setMapCenter }) {
         left: "330px",
         marginLeft: "10px",
         marginTop: "10px",
-        backgroundImage: 'url(current-location-icon.svg)',
+        backgroundImage: "url(current-location-icon.svg)",
         backgroundSize: "20px 20px",
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
       }}
-    >
-    </button>
+    ></button>
   );
 }
