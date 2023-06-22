@@ -8,7 +8,7 @@ export default async function handler(
 
   async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     const { location, radius, type } = req.query;
-    const KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+    const KEY = process.env.GOOGLE_PLACES_KEY;
     const ENDPOINT =
       "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     const requestUrl = `${ENDPOINT}?location=${location}&radius=${radius}&type=${type}&key=${KEY}`;
