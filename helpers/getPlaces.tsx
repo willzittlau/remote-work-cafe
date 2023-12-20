@@ -1,6 +1,6 @@
 export default function getPlaces(
   location: string,
-  radius: number = 1000,
+  radius: number = 10000,
   type: string = "cafe"
 ): Promise<any[]> {
   const API_URL = `/api/location?location=${location}&radius=${radius}&type=${type}`;
